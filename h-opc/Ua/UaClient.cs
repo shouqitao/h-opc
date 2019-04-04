@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Hylasoft.Opc.Ua {
+    /// <inheritdoc />
     /// <summary>
     /// Client Implementation for UA
     /// </summary>
@@ -62,6 +63,7 @@ namespace Hylasoft.Opc.Ua {
             Status = OpcStatus.Connected;
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// Connect the client to the OPC Server
         /// </summary>
@@ -74,12 +76,13 @@ namespace Hylasoft.Opc.Ua {
             PostInitializeSession();
         }
 
+        /// <inheritdoc />
         /// <summary>
-        /// Gets the datatype of an OPC tag
+        /// Gets the data-type of an OPC tag
         /// </summary>
-        /// <param name="tag">Tag to get datatype of</param>
+        /// <param name="tag">Tag to get data-type of</param>
         /// <returns>System Type</returns>
-        public System.Type GetDataType(string tag) {
+        public Type GetDataType(string tag) {
             var nodesToRead = BuildReadValueIdCollection(tag, Attributes.Value);
             DataValueCollection results;
             DiagnosticInfoCollection diag;
@@ -91,7 +94,7 @@ namespace Hylasoft.Opc.Ua {
                 results: out results,
                 diagnosticInfos: out diag);
             var type = results[0].WrappedValue.TypeInfo.BuiltInType;
-            return System.Type.GetType("System." + type.ToString());
+            return System.Type.GetType("System." + type);
         }
 
         private void SessionKeepAlive(Session session, KeepAliveEventArgs e) {
@@ -133,6 +136,7 @@ namespace Hylasoft.Opc.Ua {
         }
 
 
+        /// <inheritdoc />
         /// <summary>
         /// Gets the current status of the OPC Client
         /// </summary>
@@ -148,6 +152,7 @@ namespace Hylasoft.Opc.Ua {
             return new ReadValueIdCollection {readValue};
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// Read a tag
         /// </summary>
@@ -168,16 +173,18 @@ namespace Hylasoft.Opc.Ua {
                 diagnosticInfos: out diag);
             var val = results[0];
 
-            var readEvent = new ReadEvent<T>();
-            readEvent.Value = (T) val.Value;
-            readEvent.SourceTimestamp = val.SourceTimestamp;
-            readEvent.ServerTimestamp = val.ServerTimestamp;
+            var readEvent = new ReadEvent<T> {
+                Value = (T) val.Value,
+                SourceTimestamp = val.SourceTimestamp,
+                ServerTimestamp = val.ServerTimestamp
+            };
             if (StatusCode.IsGood(val.StatusCode)) readEvent.Quality = Quality.Good;
             if (StatusCode.IsBad(val.StatusCode)) readEvent.Quality = Quality.Bad;
             return readEvent;
         }
 
 
+        /// <inheritdoc />
         /// <summary>
         /// Read a tag asynchronously
         /// </summary>
@@ -206,10 +213,11 @@ namespace Hylasoft.Opc.Ua {
                     try {
                         CheckReturnValue(response.ServiceResult);
                         var val = results[0];
-                        var readEvent = new ReadEvent<T>();
-                        readEvent.Value = (T) val.Value;
-                        readEvent.SourceTimestamp = val.SourceTimestamp;
-                        readEvent.ServerTimestamp = val.ServerTimestamp;
+                        var readEvent = new ReadEvent<T> {
+                            Value = (T) val.Value,
+                            SourceTimestamp = val.SourceTimestamp,
+                            ServerTimestamp = val.ServerTimestamp
+                        };
                         if (StatusCode.IsGood(val.StatusCode)) readEvent.Quality = Quality.Good;
                         if (StatusCode.IsBad(val.StatusCode)) readEvent.Quality = Quality.Bad;
                         taskCompletionSource.TrySetResult(readEvent);
@@ -233,6 +241,7 @@ namespace Hylasoft.Opc.Ua {
             return new WriteValueCollection {writeValue};
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// Write a value on the specified opc tag
         /// </summary>
@@ -254,6 +263,7 @@ namespace Hylasoft.Opc.Ua {
             CheckReturnValue(results[0]);
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// Write a value on the specified opc tag asynchronously
         /// </summary>
@@ -289,6 +299,7 @@ namespace Hylasoft.Opc.Ua {
         }
 
 
+        /// <inheritdoc />
         /// <summary>
         /// Monitor the specified tag for changes
         /// </summary>
@@ -340,6 +351,7 @@ namespace Hylasoft.Opc.Ua {
             };
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// Explore a folder on the Opc Server
         /// </summary>
@@ -376,6 +388,7 @@ namespace Hylasoft.Opc.Ua {
             return await Task.Run(() => ExploreFolder(tag));
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// Finds a node on the Opc Server
         /// </summary>
@@ -395,9 +408,10 @@ namespace Hylasoft.Opc.Ua {
             }
 
             // throws an exception if not found
-            throw new OpcException(string.Format("The tag \"{0}\" doesn't exist on the Server", tag));
+            throw new OpcException($"The tag \"{tag}\" doesn't exist on the Server");
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// Find node asynchronously
         /// </summary>
@@ -405,11 +419,13 @@ namespace Hylasoft.Opc.Ua {
             return await Task.Run(() => FindNode(tag));
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// Gets the root node of the server
         /// </summary>
         public UaNode RootNode { get; private set; }
 
+        /// <inheritdoc />
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
@@ -426,7 +442,7 @@ namespace Hylasoft.Opc.Ua {
         private void CheckReturnValue(StatusCode status) {
             if (!StatusCode.IsGood(status))
                 throw new OpcException(
-                    string.Format("Invalid response from the server. (Response Status: {0})", status), status);
+                    $"Invalid response from the server. (Response Status: {status})", status);
         }
 
         /// <summary>
@@ -470,8 +486,8 @@ namespace Hylasoft.Opc.Ua {
                     eventArgs.Accept = true;
                 else
                     throw new OpcException(
-                        string.Format("Failed to validate certificate with error code {0}: {1}", eventArgs.Error.Code,
-                            eventArgs.Error.AdditionalInfo), eventArgs.Error.StatusCode);
+                        $"Failed to validate certificate with error code {eventArgs.Error.Code}: {eventArgs.Error.AdditionalInfo}",
+                        eventArgs.Error.StatusCode);
             };
             // Build the application configuration
             var appInstance = new ApplicationInstance {
@@ -542,19 +558,19 @@ namespace Hylasoft.Opc.Ua {
         /// <param name="node">the root node</param>
         /// <returns></returns>
         private UaNode FindNode(string tag, UaNode node) {
-            var folders = tag.Split('.');
-            var head = folders.FirstOrDefault();
+            string[] folders = tag.Split('.');
+            string head = folders.FirstOrDefault();
             UaNode found;
             try {
-                var subNodes = ExploreFolder(node.Tag);
+                IEnumerable<UaNode> subNodes = ExploreFolder(node.Tag);
                 found = subNodes.Single(n => n.Name == head);
             } catch (Exception ex) {
-                throw new OpcException(string.Format("The tag \"{0}\" doesn't exist on folder \"{1}\"", head, node.Tag),
+                throw new OpcException($"The tag \"{head}\" doesn't exist on folder \"{node.Tag}\"",
                     ex);
             }
 
             // remove an array element by converting it to a list
-            var folderList = folders.ToList();
+            List<string> folderList = folders.ToList();
             folderList.RemoveAt(0); // remove the first node
             folders = folderList.ToArray();
             return folders.Length == 0
@@ -564,13 +580,11 @@ namespace Hylasoft.Opc.Ua {
 
 
         private void NotifyServerConnectionLost() {
-            if (ServerConnectionLost != null)
-                ServerConnectionLost(this, EventArgs.Empty);
+            ServerConnectionLost?.Invoke(this, EventArgs.Empty);
         }
 
         private void NotifyServerConnectionRestored() {
-            if (ServerConnectionRestored != null)
-                ServerConnectionRestored(this, EventArgs.Empty);
+            ServerConnectionRestored?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
