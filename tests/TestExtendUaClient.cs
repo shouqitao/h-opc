@@ -6,21 +6,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hylasoft.Opc.Tests
-{
-  public class TestExtendUaClient : UaClient
-  {
-    public TestExtendUaClient(Uri server)
-      : base(server)
-    {
-    }
+namespace Hylasoft.Opc.Tests {
+    public class TestExtendUaClient : UaClient {
+        public TestExtendUaClient(Uri server)
+            : base(server) { }
 
-    public Session SessionExtended
-    {
-      get
-      {
-        return this.Session;
-      }
+        public Session SessionExtended {
+            get { return this.Session; }
+        }
     }
-  }
 }
