@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Node = Hylasoft.Opc.Common.Node;
 
 namespace Hylasoft.Opc.Ua {
     /// <inheritdoc />
@@ -557,7 +558,7 @@ namespace Hylasoft.Opc.Ua {
         /// <param name="tag">the tag to find</param>
         /// <param name="node">the root node</param>
         /// <returns></returns>
-        private UaNode FindNode(string tag, UaNode node) {
+        private UaNode FindNode(string tag, Node node) {
             string[] folders = tag.Split('.');
             string head = folders.FirstOrDefault();
             UaNode found;

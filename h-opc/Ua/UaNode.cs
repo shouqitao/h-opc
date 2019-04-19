@@ -1,6 +1,7 @@
 ﻿using Hylasoft.Opc.Common;
 
 namespace Hylasoft.Opc.Ua {
+    /// <inheritdoc />
     /// <summary>
     /// Represents a node to be used specifically for OPC UA
     /// </summary>
@@ -10,6 +11,7 @@ namespace Hylasoft.Opc.Ua {
         /// </summary>
         public string NodeId { get; private set; }
 
+        /// <inheritdoc />
         /// <summary>
         /// Instantiates a UaNode class
         /// </summary>
